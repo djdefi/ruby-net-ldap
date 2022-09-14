@@ -5,7 +5,7 @@ networks:
 
 services:
   openldap:
-    image: osixia/openldap:1.4.0
+    image: osixia/openldap:1.5.0
     networks:
       integration_test_network:
         aliases:
@@ -67,6 +67,20 @@ services:
     working_dir: /code
 
   ci-3.0:
+    image: ruby:3.0
+    entrypoint: /code/ci-run.sh
+    environment:
+      INTEGRATION: openldap
+      INTEGRATION_HOST: ldap.example.org
+    depends_on:
+      - openldap
+    networks:
+      integration_test_network:
+    volumes:
+      - .:/code
+    working_dir: /code
+  
+  ci-3.1:
     image: ruby:3.0
     entrypoint: /code/ci-run.sh
     environment:

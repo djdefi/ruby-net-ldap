@@ -538,7 +538,7 @@ Style/NumericPredicate:
     - 'testserver/ldapserver.rb'
 
 # Offense count: 3
-Style/OpMethod:
+Naming/BinaryOperatorParameter:
   Exclude:
     - 'lib/net/ldap/filter.rb'
 

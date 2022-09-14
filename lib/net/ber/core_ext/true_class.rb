@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 ##
 # BER extensions to +true+.
 module Net::BER::Extensions::TrueClass

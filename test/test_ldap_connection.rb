@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'test_helper'
 
 class TestLDAPConnection < Test::Unit::TestCase
@@ -159,7 +161,7 @@ class TestLDAPConnectionSocketReads < Test::Unit::TestCase
       app_tag: Net::LDAP::PDU::SearchResult,
       code: Net::LDAP::ResultCodeSuccess,
       matched_dn: "",
-      error_message: "",
+      error_message: ""
     }.merge(options)
     result = Net::BER::BerIdentifiedArray.new([options[:code], options[:matched_dn], options[:error_message]])
     result.ber_identifier = options[:app_tag]
@@ -253,7 +255,7 @@ class TestLDAPConnectionSocketReads < Test::Unit::TestCase
     conn.next_msgid # simulates ongoing query
 
     assert result = conn.rename(
-      olddn:  "uid=renamable-user1,ou=People,dc=rubyldap,dc=com",
+      olddn: "uid=renamable-user1,ou=People,dc=rubyldap,dc=com",
       newrdn: "uid=renamed-user1",
     )
     assert result.success?
@@ -346,7 +348,7 @@ class TestLDAPConnectionSocketReads < Test::Unit::TestCase
     options = {
       code: Net::LDAP::ResultCodeSuccess,
       matched_dn: "",
-      error_message: "",
+      error_message: ""
     }
     ber = Net::BER::BerIdentifiedArray.new([options[:code], options[:matched_dn], options[:error_message]])
     assert_raise Net::LDAP::PDU::Error do

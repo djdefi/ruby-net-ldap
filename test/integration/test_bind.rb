@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require_relative '../test_helper'
 
 class TestBindIntegration < LDAPIntegrationTestCase
-  INTEGRATION_HOSTNAME = 'ldap.example.org'.freeze
+  INTEGRATION_HOSTNAME = 'ldap.example.org'
 
   def test_bind_success
     assert @ldap.bind(BIND_CREDS),
@@ -40,7 +42,7 @@ class TestBindIntegration < LDAPIntegrationTestCase
     omit "We need to update our CA cert"
     @ldap.host = INTEGRATION_HOSTNAME
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: TLS_OPTS.merge(ca_file: CA_FILE),
     )
     assert @ldap.bind(BIND_CREDS),
@@ -50,7 +52,7 @@ class TestBindIntegration < LDAPIntegrationTestCase
   def test_bind_tls_with_bad_hostname_verify_none_no_ca_passes
     @ldap.host = INTEGRATION_HOSTNAME
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
     )
     assert @ldap.bind(BIND_CREDS),
@@ -60,7 +62,7 @@ class TestBindIntegration < LDAPIntegrationTestCase
   def test_bind_tls_with_bad_hostname_verify_none_no_ca_opt_merge_passes
     @ldap.host = 'cert.mismatch.example.org'
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: TLS_OPTS.merge(verify_mode: OpenSSL::SSL::VERIFY_NONE),
     )
     assert @ldap.bind(BIND_CREDS),
@@ -71,9 +73,9 @@ class TestBindIntegration < LDAPIntegrationTestCase
     omit "We need to update our CA cert"
     @ldap.host = 'cert.mismatch.example.org'
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: { verify_mode: OpenSSL::SSL::VERIFY_PEER,
-                     ca_file:     CA_FILE },
+                     ca_file: CA_FILE },
     )
     error = assert_raise Net::LDAP::Error,
                          Errno::ECONNREFUSED do
@@ -89,7 +91,7 @@ class TestBindIntegration < LDAPIntegrationTestCase
     omit "We need to update our CA cert"
     @ldap.host = 'cert.mismatch.example.org'
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: TLS_OPTS.merge(ca_file: CA_FILE),
     )
     error = assert_raise Net::LDAP::Error,
@@ -106,7 +108,7 @@ class TestBindIntegration < LDAPIntegrationTestCase
     omit "We need to update our CA cert"
     @ldap.host = 'cert.mismatch.example.org'
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: { ca_file: CA_FILE },
     )
     error = assert_raise Net::LDAP::Error,
@@ -123,9 +125,9 @@ class TestBindIntegration < LDAPIntegrationTestCase
     omit "We need to update our CA cert"
     @ldap.host = INTEGRATION_HOSTNAME
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: TLS_OPTS.merge(verify_mode: OpenSSL::SSL::VERIFY_PEER,
-                                  ca_file:     CA_FILE),
+                                  ca_file: CA_FILE),
     )
     assert @ldap.bind(BIND_CREDS),
            @ldap.get_operation_result.inspect
@@ -135,9 +137,9 @@ class TestBindIntegration < LDAPIntegrationTestCase
     omit "We need to update our CA cert"
     @ldap.host = INTEGRATION_HOSTNAME
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: { verify_mode: OpenSSL::SSL::VERIFY_PEER,
-                     ca_file:     CA_FILE },
+                     ca_file: CA_FILE },
     )
     assert @ldap.bind(BIND_CREDS),
            @ldap.get_operation_result.inspect
@@ -161,9 +163,9 @@ class TestBindIntegration < LDAPIntegrationTestCase
     @ldap.host = nil
     @ldap.hosts = [[INTEGRATION_HOSTNAME, 389], [INTEGRATION_HOSTNAME, 389]]
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: TLS_OPTS.merge(verify_mode: OpenSSL::SSL::VERIFY_PEER,
-                                  ca_file:     CA_FILE),
+                                  ca_file: CA_FILE),
     )
     assert @ldap.bind(BIND_CREDS),
            @ldap.get_operation_result.inspect
@@ -174,9 +176,9 @@ class TestBindIntegration < LDAPIntegrationTestCase
     @ldap.host = nil
     @ldap.hosts = [['cert.mismatch.example.org', 389], ['bogus.example.com', 389]]
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: TLS_OPTS.merge(verify_mode: OpenSSL::SSL::VERIFY_PEER,
-                                  ca_file:     CA_FILE),
+                                  ca_file: CA_FILE),
     )
     error = assert_raise Net::LDAP::Error,
                          Net::LDAP::ConnectionError do
@@ -191,7 +193,7 @@ class TestBindIntegration < LDAPIntegrationTestCase
     @ldap.host = nil
     @ldap.hosts = [['cert.mismatch.example.org', 389], ['bogus.example.com', 389]]
     @ldap.encryption(
-      method:      :start_tls,
+      method: :start_tls,
       tls_options: TLS_OPTS.merge(verify_mode: OpenSSL::SSL::VERIFY_NONE),
     )
     assert @ldap.bind(BIND_CREDS),

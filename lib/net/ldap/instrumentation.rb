@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Net::LDAP::Instrumentation
   attr_reader :instrumentation_service
   private     :instrumentation_service

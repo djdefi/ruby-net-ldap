@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test_helper'
 
 class TestBERIntegration < LDAPIntegrationTestCase
@@ -21,6 +23,7 @@ class TestBERIntegration < LDAPIntegrationTestCase
     # assert values are empty
     types_entry.each do |name, values|
       next if name == :dn
+
       assert values.empty?
     end
 

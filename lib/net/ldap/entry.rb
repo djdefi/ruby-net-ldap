@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 ##
 # Objects of this class represent individual entries in an LDAP directory.
 # User code generally does not instantiate this class. Net::LDAP#search
@@ -44,20 +46,20 @@
 class Net::LDAP::Entry
   ##
   # This constructor is not generally called by user code.
-  def initialize(dn = nil) #:nodoc:
+  def initialize(dn = nil) # :nodoc:
     @myhash = {}
     @myhash[:dn] = [dn]
   end
 
   ##
   # Use the LDIF format for Marshal serialization.
-  def _dump(depth) #:nodoc:
+  def _dump(depth) # :nodoc:
     to_ldif
   end
 
   ##
   # Use the LDIF format for Marshal serialization.
-  def self._load(entry) #:nodoc:
+  def self._load(entry) # :nodoc:
     from_single_ldif_string(entry)
   end
 
@@ -76,6 +78,7 @@ class Net::LDAP::Entry
       entry = ds.to_entries.first
 
       return nil if entry.dn.nil?
+
       entry
     end
 
@@ -148,6 +151,7 @@ class Net::LDAP::Entry
   # (possibly empty) \Array of data values.
   def each # :yields: attribute-name, data-values-array
     return unless block_given?
+
     attribute_names.each do|a|
       attr_name, values = a, self[a]
       yield attr_name, values
@@ -161,12 +165,13 @@ class Net::LDAP::Entry
     Net::LDAP::Dataset.from_entry(self).to_ldif_string
   end
 
-  def respond_to?(sym, include_all = false) #:nodoc:
+  def respond_to?(sym, include_all = false) # :nodoc:
     return true if valid_attribute?(self.class.attribute_name(sym))
+
     return super
   end
 
-  def method_missing(sym, *args, &block) #:nodoc:
+  def method_missing(sym, *args, &block) # :nodoc:
     name = self.class.attribute_name(sym)
 
     if valid_attribute?(name )
@@ -198,4 +203,4 @@ class Net::LDAP::Entry
   def ==(other)
     other.instance_of?(self.class) && @myhash == other.to_h
   end
-end # class Entry
+end

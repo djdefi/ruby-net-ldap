@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # $Id: testpsw.rb 72 2006-04-24 21:58:14Z blackhedd $
 
 require_relative 'test_helper'

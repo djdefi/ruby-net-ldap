@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 require_relative 'ldap/version'
 
 module Net # :nodoc:
@@ -128,10 +130,10 @@ module Net # :nodoc:
     # <tr><th><tt>0b11______</tt></th><td>Private Types</td></tr>
     # </table>
     TAG_CLASS = {
-      :universal        => 0b00000000, # 0
-      :application      => 0b01000000, # 64
+      :universal => 0b00000000, # 0
+      :application => 0b01000000, # 64
       :context_specific => 0b10000000, # 128
-      :private          => 0b11000000, # 192
+      :private => 0b11000000 # 192
     }
 
     ##
@@ -143,8 +145,8 @@ module Net # :nodoc:
     # <tr><th><tt>0b__1_____</tt></th><td>Constructed</td></tr>
     # </table>
     ENCODING_TYPE = {
-      :primitive    => 0b00000000,  # 0
-      :constructed  => 0b00100000,  # 32
+      :primitive => 0b00000000,  # 0
+      :constructed => 0b00100000  # 32
     }
 
     ##
@@ -257,10 +259,6 @@ class Net::BER::BerError < RuntimeError; end
 # An Array object with a BER identifier attached.
 class Net::BER::BerIdentifiedArray < Array
   attr_accessor :ber_identifier
-
-  def initialize(*args)
-    super
-  end
 end
 
 ##
@@ -328,6 +326,7 @@ class Net::BER::BerIdentifiedString < String
     # to 'UTF-8' (NOTE: we do NOT change the bytes, but only set the
     # encoding to 'UTF-8').
     return unless encoding == Encoding::BINARY
+
     current_encoding = encoding
     force_encoding('UTF-8')
     force_encoding(current_encoding) unless valid_encoding?
@@ -339,6 +338,7 @@ module Net::BER
   # A BER null object.
   class BerIdentifiedNull
     attr_accessor :ber_identifier
+
     def to_ber
     "\005\000"
     end

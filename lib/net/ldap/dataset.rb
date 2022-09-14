@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 ##
 # An LDAP Dataset. Used primarily as an intermediate format for converting
 # to and from LDIF strings and Net::LDAP::Entry objects.
@@ -17,7 +19,7 @@ class Net::LDAP::Dataset < Hash
   ##
   # Outputs an LDAP Dataset as an array of strings representing LDIF
   # entries.
-  def to_ldif
+  def to_ldif(&block)
     ary = []
 
     if version
@@ -43,7 +45,7 @@ class Net::LDAP::Dataset < Hash
 
       ary << ""
     end
-    block_given? and ary.each { |line| yield line}
+    block_given? and ary.each(&block)
 
     ary
   end
@@ -82,6 +84,7 @@ class Net::LDAP::Dataset < Hash
   def value_is_binary?(value) # :nodoc:
     value = value.to_s
     return true if value[0] == ?: or value[0] == ?<
+
     value.each_byte { |byte| return true if (byte < 32) || (byte > 126) }
     false
   end
@@ -94,7 +97,7 @@ class Net::LDAP::Dataset < Hash
       end
       def gets
         s = @io.gets
-        s.chomp if s
+        s&.chomp
       end
     end
 
@@ -106,6 +109,7 @@ class Net::LDAP::Dataset < Hash
       hash = {}
       entry.each_attribute do |attribute, value|
         next if attribute == :dn
+
         hash[attribute] = value
       end
       dataset[entry.dn] = hash
@@ -133,10 +137,10 @@ class Net::LDAP::Dataset < Hash
           if line =~ /^#/
             ds.comments << line
             yield :comment, line if block_given?
-          elsif line =~ /^version:[\s]*([0-9]+)$/i
+          elsif line =~ /^version:\s*([0-9]+)$/i
             ds.version = $1
             yield :version, line if block_given?
-          elsif line =~ /^dn:([\:]?)[\s]*/i
+          elsif line =~ /^dn:(:?)\s*/i
             # $1 is a colon if the dn-value is base-64 encoded
             # $' is the dn-value
             # Avoid the Base64 class because not all Ruby versions have it.
@@ -146,7 +150,7 @@ class Net::LDAP::Dataset < Hash
           elsif line.empty?
             dn = nil
             yield :end, nil if block_given?
-          elsif line =~ /^([^:]+):([\:]?)[\s]*/
+          elsif line =~ /^([^:]+):(:?)\s*/
             # $1 is the attribute name
             # $2 is a colon iff the attr-value is base-64 encoded
             # $' is the attr-value

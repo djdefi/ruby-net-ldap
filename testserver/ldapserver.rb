@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # $Id$
 #
 # Copyright (C) 2006 by Francis Cianfrocca. All Rights Reserved.
@@ -22,8 +24,8 @@ module LdapServer
         3 => :array                # LDAP SearchRequest
       },
       :primitive => {
-        2 => :string,              # ldapsearch sends this to unbind
-      },
+        2 => :string              # ldapsearch sends this to unbind
+      }
     },
     :context_specific => {
       :primitive => {
@@ -32,8 +34,8 @@ module LdapServer
       },
       :constructed => {
         3 => :array                # equality filter
-      },
-    },
+      }
+    }
   }
 
   def post_init
@@ -46,7 +48,7 @@ module LdapServer
     while pdu = @data.read_ber!(LdapServerAsnSyntax)
       begin
         handle_ldap_pdu pdu
-      rescue
+      rescue StandardError
         $logger.error "closing connection due to error #{$!}"
         close_connection
       end
@@ -163,10 +165,10 @@ def load_test_data
   ary = File.readlines("./testdata.ldif")
   hash = {}
   while (line = ary.shift) && line.chomp!
-    if line =~ /^dn:[\s]*/i
+    if line =~ /^dn:\s*/i
       dn = $'
       hash[dn] = {}
-      while (attr = ary.shift) && attr.chomp! && attr =~ /^([\w]+)[\s]*:[\s]*/
+      while (attr = ary.shift) && attr.chomp! && attr =~ /^(\w+)\s*:\s*/
         hash[dn][$1.downcase] ||= []
         hash[dn][$1.downcase] << $'
       end

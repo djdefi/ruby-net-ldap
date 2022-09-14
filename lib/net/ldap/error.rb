@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 class Net::LDAP
   class Error < StandardError; end
 
   class AlreadyOpenedError < Error; end
   class SocketError < Error; end
+
   class ConnectionError < Error
     def self.new(errors)
       error = errors.first.first
@@ -20,6 +23,7 @@ class Net::LDAP
       super(message)
     end
   end
+
   class NoOpenSSLError < Error; end
   class NoStartTLSResultError < Error; end
   class NoSearchBaseError < Error; end

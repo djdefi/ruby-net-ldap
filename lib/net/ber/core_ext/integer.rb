@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 ##
 # BER extensions to the Integer class, affecting Fixnum and Bignum objects.
 module Net::BER::Extensions::Integer
@@ -20,7 +22,7 @@ module Net::BER::Extensions::Integer
     if self <= 127
       [self].pack('C')
     else
-      i = [self].pack('N').sub(/^[\0]+/, "")
+      i = [self].pack('N').sub(/^\0+/, "")
       [0x80 + i.length].pack('C') + i
     end
   end

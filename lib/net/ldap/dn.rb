@@ -1,4 +1,5 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
 
 ##
 # Objects of this class represent an LDAP DN ("Distinguished Name"). A DN
@@ -48,38 +49,38 @@ class Net::LDAP::DN
 
     @dn.each_char do |char|
       case state
-      when :key then
+      when :key
         case char
-        when 'a'..'z', 'A'..'Z' then
+        when 'a'..'z', 'A'..'Z'
           state = :key_normal
           key << char
-        when '0'..'9' then
+        when '0'..'9'
           state = :key_oid
           key << char
         when ' ' then state = :key
         else raise Net::LDAP::InvalidDNError, "DN badly formed"
         end
-      when :key_normal then
+      when :key_normal
         case char
         when '=' then state = :value
         when 'a'..'z', 'A'..'Z', '0'..'9', '-', ' ' then key << char
         else raise Net::LDAP::InvalidDNError, "DN badly formed"
         end
-      when :key_oid then
+      when :key_oid
         case char
         when '=' then state = :value
         when '0'..'9', '.', ' ' then key << char
         else raise Net::LDAP::InvalidDNError, "DN badly formed"
         end
-      when :value then
+      when :value
         case char
         when '\\' then state = :value_normal_escape
         when '"' then state = :value_quoted
         when ' ' then state = :value
-        when '#' then
+        when '#'
           state = :value_hexstring
           value << char
-        when ',' then
+        when ','
           state = :key
           yield key.string.strip, value.string.rstrip
           key = StringIO.new
@@ -88,76 +89,76 @@ class Net::LDAP::DN
           state = :value_normal
           value << char
         end
-      when :value_normal then
+      when :value_normal
         case char
         when '\\' then state = :value_normal_escape
-        when ',' then
+        when ','
           state = :key
           yield key.string.strip, value.string.rstrip
           key = StringIO.new
           value = StringIO.new;
         else value << char
         end
-      when :value_normal_escape then
+      when :value_normal_escape
         case char
-        when '0'..'9', 'a'..'f', 'A'..'F' then
+        when '0'..'9', 'a'..'f', 'A'..'F'
           state = :value_normal_escape_hex
           hex_buffer = char
         else state = :value_normal; value << char
         end
-      when :value_normal_escape_hex then
+      when :value_normal_escape_hex
         case char
-        when '0'..'9', 'a'..'f', 'A'..'F' then
+        when '0'..'9', 'a'..'f', 'A'..'F'
           state = :value_normal
           value << "#{hex_buffer}#{char}".to_i(16).chr
         else raise Net::LDAP::InvalidDNError, "DN badly formed"
         end
-      when :value_quoted then
+      when :value_quoted
         case char
         when '\\' then state = :value_quoted_escape
         when '"' then state = :value_end
         else value << char
         end
-      when :value_quoted_escape then
+      when :value_quoted_escape
         case char
-        when '0'..'9', 'a'..'f', 'A'..'F' then
+        when '0'..'9', 'a'..'f', 'A'..'F'
           state = :value_quoted_escape_hex
           hex_buffer = char
         else
           state = :value_quoted;
           value << char
         end
-      when :value_quoted_escape_hex then
+      when :value_quoted_escape_hex
         case char
-        when '0'..'9', 'a'..'f', 'A'..'F' then
+        when '0'..'9', 'a'..'f', 'A'..'F'
           state = :value_quoted
           value << "#{hex_buffer}#{char}".to_i(16).chr
         else raise Net::LDAP::InvalidDNError, "DN badly formed"
         end
-      when :value_hexstring then
+      when :value_hexstring
         case char
-        when '0'..'9', 'a'..'f', 'A'..'F' then
+        when '0'..'9', 'a'..'f', 'A'..'F'
           state = :value_hexstring_hex
           value << char
         when ' ' then state = :value_end
-        when ',' then
+        when ','
           state = :key
           yield key.string.strip, value.string.rstrip
           key = StringIO.new
           value = StringIO.new;
         else raise Net::LDAP::InvalidDNError, "DN badly formed"
         end
-      when :value_hexstring_hex then
+      when :value_hexstring_hex
         case char
-        when '0'..'9', 'a'..'f', 'A'..'F' then
+        when '0'..'9', 'a'..'f', 'A'..'F'
           state = :value_hexstring
           value << char
         else raise Net::LDAP::InvalidDNError, "DN badly formed"
         end
-      when :value_end then
+      when :value_end
         case char
         when ' ' then state = :value_end
-        when ',' then
+        when ','
           state = :key
           yield key.string.strip, value.string.rstrip
           key = StringIO.new
@@ -193,13 +194,13 @@ class Net::LDAP::DN
   # for dn values. All of the following must be escaped in any normal string
   # using a single backslash ('\') as escape.
   ESCAPES = {
-    ','  => ',',
-    '+'  => '+',
-    '"'  => '"',
+    ',' => ',',
+    '+' => '+',
+    '"' => '"',
     '\\' => '\\',
     '<' => '<',
     '>' => '>',
-    ';' => ';',
+    ';' => ';'
   }
 
   # Compiled character class regexp using the keys from the above hash, and
@@ -212,7 +213,7 @@ class Net::LDAP::DN
   ##
   # Escape a string for use in a DN value
   def self.escape(string)
-    string.gsub(ESCAPE_RE) { |char| "\\" + ESCAPES[char] }
+    string.gsub(ESCAPE_RE) { |char| "\\#{ESCAPES[char]}" }
   end
 
   ##

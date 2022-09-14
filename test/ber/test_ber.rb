@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test_helper'
 
 class TestBEREncoding < Test::Unit::TestCase
@@ -23,39 +25,39 @@ class TestBEREncoding < Test::Unit::TestCase
 
   # Sample based
   {
-    0           => "\x02\x01\x00",
-    1           => "\x02\x01\x01",
-    127         => "\x02\x01\x7F",
-    128         => "\x02\x02\x00\x80",
-    255         => "\x02\x02\x00\xFF",
-    256         => "\x02\x02\x01\x00",
-    65535       => "\x02\x03\x00\xFF\xFF",
-    65536       => "\x02\x03\x01\x00\x00",
-    8388607     => "\x02\x03\x7F\xFF\xFF",
-    8388608     => "\x02\x04\x00\x80\x00\x00",
-    16_777_215  => "\x02\x04\x00\xFF\xFF\xFF",
-    0x01000000  => "\x02\x04\x01\x00\x00\x00",
-    0x3FFFFFFF  => "\x02\x04\x3F\xFF\xFF\xFF",
-    0x4FFFFFFF  => "\x02\x04\x4F\xFF\xFF\xFF",
+    0 => "\x02\x01\x00",
+    1 => "\x02\x01\x01",
+    127 => "\x02\x01\x7F",
+    128 => "\x02\x02\x00\x80",
+    255 => "\x02\x02\x00\xFF",
+    256 => "\x02\x02\x01\x00",
+    65535 => "\x02\x03\x00\xFF\xFF",
+    65536 => "\x02\x03\x01\x00\x00",
+    8388607 => "\x02\x03\x7F\xFF\xFF",
+    8388608 => "\x02\x04\x00\x80\x00\x00",
+    16_777_215 => "\x02\x04\x00\xFF\xFF\xFF",
+    0x01000000 => "\x02\x04\x01\x00\x00\x00",
+    0x3FFFFFFF => "\x02\x04\x3F\xFF\xFF\xFF",
+    0x4FFFFFFF => "\x02\x04\x4F\xFF\xFF\xFF",
 
     # Some odd samples...
-    5           => "\x02\x01\x05",
-    500         => "\x02\x02\x01\xf4",
-    50_000      => "\x02\x03\x00\xC3\x50",
+    5 => "\x02\x01\x05",
+    500 => "\x02\x02\x01\xf4",
+    50_000 => "\x02\x03\x00\xC3\x50",
     5_000_000_000 => "\x02\x05\x01\x2a\x05\xF2\x00",
 
     # negatives
-    -1          => "\x02\x01\xFF",
-    -127        => "\x02\x01\x81",
-    -128        => "\x02\x01\x80",
-    -255        => "\x02\x02\xFF\x01",
-    -256        => "\x02\x02\xFF\x00",
-    -65535      => "\x02\x03\xFF\x00\x01",
-    -65536      => "\x02\x03\xFF\x00\x00",
-    -65537      => "\x02\x03\xFE\xFF\xFF",
-    -8388607    => "\x02\x03\x80\x00\x01",
-    -8388608    => "\x02\x03\x80\x00\x00",
-    -16_777_215 => "\x02\x04\xFF\x00\x00\x01",
+    -1 => "\x02\x01\xFF",
+    -127 => "\x02\x01\x81",
+    -128 => "\x02\x01\x80",
+    -255 => "\x02\x02\xFF\x01",
+    -256 => "\x02\x02\xFF\x00",
+    -65535 => "\x02\x03\xFF\x00\x01",
+    -65536 => "\x02\x03\xFF\x00\x00",
+    -65537 => "\x02\x03\xFE\xFF\xFF",
+    -8388607 => "\x02\x03\x80\x00\x01",
+    -8388608 => "\x02\x03\x80\x00\x00",
+    -16_777_215 => "\x02\x04\xFF\x00\x00\x01"
   }.each do |number, expected_encoding|
     define_method "test_encode_#{number}" do
       assert_equal expected_encoding.b, number.to_ber
@@ -94,7 +96,7 @@ class TestBEREncoding < Test::Unit::TestCase
 
     def test_encode_binary_data
       # This is used for searching for GUIDs in Active Directory
-      assert_equal "\x04\x10" + "j1\xB4\xA1*\xA2zA\xAC\xA9`?'\xDDQ\x16".b,
+      assert_equal "\u0004\u0010#{"j1\xB4\xA1*\xA2zA\xAC\xA9`?'\xDDQ\x16".b}",
                    ["6a31b4a12aa27a41aca9603f27dd5116"].pack("H*").to_ber_bin
     end
 

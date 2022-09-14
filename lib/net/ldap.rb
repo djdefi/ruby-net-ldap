@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 require 'ostruct'
 
 module Net # :nodoc:
@@ -293,11 +295,11 @@ class Net::LDAP
     15 => :array, # CompareResponse
     16 => :array, # AbandonRequest
     19 => :array, # SearchResultReferral
-    24 => :array, # Unsolicited Notification
+    24 => :array # Unsolicited Notification
   }
   application = {
     :primitive => primitive,
-    :constructed => constructed,
+    :constructed => constructed
   }
   primitive = {
     0 => :string, # password
@@ -305,7 +307,7 @@ class Net::LDAP
     2 => :string, # Kerberos v5
     3 => :string, # SearchFilter-extensible
     4 => :string, # SearchFilter-extensible
-    7 => :string, # serverSaslCreds
+    7 => :string # serverSaslCreds
   }
   constructed = {
     0 => :array, # RFC-2251 Control and Filter-AND
@@ -316,17 +318,17 @@ class Net::LDAP
     5 => :array, # SearchFilter-GE
     6 => :array, # SearchFilter-LE
     7 => :array, # serverSaslCreds
-    9 => :array, # SearchFilter-extensible
+    9 => :array # SearchFilter-extensible
   }
   context_specific = {
     :primitive => primitive,
-    :constructed => constructed,
+    :constructed => constructed
   }
 
   universal = {
     constructed: {
-      107 => :array, #ExtendedResponse (PasswdModifyResponseValue)
-    },
+      107 => :array #ExtendedResponse (PasswdModifyResponseValue)
+    }
   }
 
   AsnSyntax = Net::BER.compile_syntax(:application => application,
@@ -401,44 +403,44 @@ class Net::LDAP
 
   # map of result code to human message
   ResultStrings = {
-    ResultCodeSuccess                      => "Success",
-    ResultCodeOperationsError              => "Operations Error",
-    ResultCodeProtocolError                => "Protocol Error",
-    ResultCodeTimeLimitExceeded            => "Time Limit Exceeded",
-    ResultCodeSizeLimitExceeded            => "Size Limit Exceeded",
-    ResultCodeCompareFalse                 => "False Comparison",
-    ResultCodeCompareTrue                  => "True Comparison",
-    ResultCodeAuthMethodNotSupported       => "Auth Method Not Supported",
-    ResultCodeStrongerAuthRequired         => "Stronger Auth Needed",
-    ResultCodeReferral                     => "Referral",
-    ResultCodeAdminLimitExceeded           => "Admin Limit Exceeded",
+    ResultCodeSuccess => "Success",
+    ResultCodeOperationsError => "Operations Error",
+    ResultCodeProtocolError => "Protocol Error",
+    ResultCodeTimeLimitExceeded => "Time Limit Exceeded",
+    ResultCodeSizeLimitExceeded => "Size Limit Exceeded",
+    ResultCodeCompareFalse => "False Comparison",
+    ResultCodeCompareTrue => "True Comparison",
+    ResultCodeAuthMethodNotSupported => "Auth Method Not Supported",
+    ResultCodeStrongerAuthRequired => "Stronger Auth Needed",
+    ResultCodeReferral => "Referral",
+    ResultCodeAdminLimitExceeded => "Admin Limit Exceeded",
     ResultCodeUnavailableCriticalExtension => "Unavailable critical extension",
-    ResultCodeConfidentialityRequired      => "Confidentiality Required",
-    ResultCodeSaslBindInProgress           => "saslBindInProgress",
-    ResultCodeNoSuchAttribute              => "No Such Attribute",
-    ResultCodeUndefinedAttributeType       => "Undefined Attribute Type",
-    ResultCodeInappropriateMatching        => "Inappropriate Matching",
-    ResultCodeConstraintViolation          => "Constraint Violation",
-    ResultCodeAttributeOrValueExists       => "Attribute or Value Exists",
-    ResultCodeInvalidAttributeSyntax       => "Invalide Attribute Syntax",
-    ResultCodeNoSuchObject                 => "No Such Object",
-    ResultCodeAliasProblem                 => "Alias Problem",
-    ResultCodeInvalidDNSyntax              => "Invalid DN Syntax",
-    ResultCodeAliasDereferencingProblem    => "Alias Dereferencing Problem",
-    ResultCodeInappropriateAuthentication  => "Inappropriate Authentication",
-    ResultCodeInvalidCredentials           => "Invalid Credentials",
-    ResultCodeInsufficientAccessRights     => "Insufficient Access Rights",
-    ResultCodeBusy                         => "Busy",
-    ResultCodeUnavailable                  => "Unavailable",
-    ResultCodeUnwillingToPerform           => "Unwilling to perform",
-    ResultCodeNamingViolation              => "Naming Violation",
-    ResultCodeObjectClassViolation         => "Object Class Violation",
-    ResultCodeNotAllowedOnNonLeaf          => "Not Allowed On Non-Leaf",
-    ResultCodeNotAllowedOnRDN              => "Not Allowed On RDN",
-    ResultCodeEntryAlreadyExists           => "Entry Already Exists",
-    ResultCodeObjectClassModsProhibited    => "ObjectClass Modifications Prohibited",
-    ResultCodeAffectsMultipleDSAs          => "Affects Multiple DSAs",
-    ResultCodeOther                        => "Other",
+    ResultCodeConfidentialityRequired => "Confidentiality Required",
+    ResultCodeSaslBindInProgress => "saslBindInProgress",
+    ResultCodeNoSuchAttribute => "No Such Attribute",
+    ResultCodeUndefinedAttributeType => "Undefined Attribute Type",
+    ResultCodeInappropriateMatching => "Inappropriate Matching",
+    ResultCodeConstraintViolation => "Constraint Violation",
+    ResultCodeAttributeOrValueExists => "Attribute or Value Exists",
+    ResultCodeInvalidAttributeSyntax => "Invalide Attribute Syntax",
+    ResultCodeNoSuchObject => "No Such Object",
+    ResultCodeAliasProblem => "Alias Problem",
+    ResultCodeInvalidDNSyntax => "Invalid DN Syntax",
+    ResultCodeAliasDereferencingProblem => "Alias Dereferencing Problem",
+    ResultCodeInappropriateAuthentication => "Inappropriate Authentication",
+    ResultCodeInvalidCredentials => "Invalid Credentials",
+    ResultCodeInsufficientAccessRights => "Insufficient Access Rights",
+    ResultCodeBusy => "Busy",
+    ResultCodeUnavailable => "Unavailable",
+    ResultCodeUnwillingToPerform => "Unwilling to perform",
+    ResultCodeNamingViolation => "Naming Violation",
+    ResultCodeObjectClassViolation => "Object Class Violation",
+    ResultCodeNotAllowedOnNonLeaf => "Not Allowed On Non-Leaf",
+    ResultCodeNotAllowedOnRDN => "Not Allowed On RDN",
+    ResultCodeEntryAlreadyExists => "Entry Already Exists",
+    ResultCodeObjectClassModsProhibited => "ObjectClass Modifications Prohibited",
+    ResultCodeAffectsMultipleDSAs => "Affects Multiple DSAs",
+    ResultCodeOther => "Other"
   }
 
   module LDAPControls
@@ -452,10 +454,7 @@ class Net::LDAP
     ResultStrings[code] || "unknown result (#{code})"
   end
 
-  attr_accessor :host
-  attr_accessor :port
-  attr_accessor :hosts
-  attr_accessor :base
+  attr_accessor :host, :port, :hosts, :base
 
   # Instantiate an object of type Net::LDAP to perform directory operations.
   # This constructor takes a Hash containing arguments, all of which are
@@ -603,7 +602,7 @@ class Net::LDAP
     @auth = {
       :method => :simple,
       :username => username,
-      :password => password,
+      :password => password
     }
   end
   alias_method :auth, :authenticate
@@ -621,6 +620,7 @@ class Net::LDAP
   def encryption(args)
     warn "Deprecation warning: please give :encryption option as a Hash to Net::LDAP.new"
     return if args.nil?
+
     @encryption = normalize_encryption(args)
   end
 
@@ -639,9 +639,9 @@ class Net::LDAP
   #    ldap.add(...)
   #    ldap.modify(...)
   #  end
-  def self.open(args)
+  def self.open(args, &block)
     ldap1 = new(args)
-    ldap1.open { |ldap| yield ldap }
+    ldap1.open(&block)
   end
 
   # Returns a meaningful result any time after a protocol operation (#bind,
@@ -709,15 +709,13 @@ class Net::LDAP
     raise Net::LDAP::AlreadyOpenedError, "Open already in progress" if @open_connection
 
     instrument "open.net_ldap" do |payload|
-      begin
-        @open_connection = new_connection
-        payload[:connection] = @open_connection
-        payload[:bind]       = @result = @open_connection.bind(@auth)
-        yield self
-      ensure
-        @open_connection.close if @open_connection
-        @open_connection = nil
-      end
+      @open_connection = new_connection
+      payload[:connection] = @open_connection
+      payload[:bind]       = @result = @open_connection.bind(@auth)
+      yield self
+    ensure
+      @open_connection&.close
+      @open_connection = nil
     end
   end
 
@@ -788,10 +786,8 @@ class Net::LDAP
       end
 
       if return_result_set
-        unless @result.nil?
-          if ResultCodesSearchSuccess.include?(@result.result_code)
-            result_set
-          end
+        if !@result.nil? && ResultCodesSearchSuccess.include?(@result.result_code)
+          result_set
         end
       else
         @result.success?
@@ -867,7 +863,7 @@ class Net::LDAP
           payload[:connection] = conn
           payload[:bind]       = @result = conn.bind(auth)
         ensure
-          conn.close if conn
+          conn&.close
         end
       end
 
@@ -925,7 +921,7 @@ class Net::LDAP
     result = false
     open do |me|
       rs = search args
-      if rs and rs.first and dn = rs.first.dn
+      if rs&.first and dn = rs.first.dn
         password = args[:password]
         password = password.call if password.respond_to?(:call)
         result = rs if bind(:method => :simple, :username => dn,
@@ -1224,7 +1220,7 @@ class Net::LDAP
                   :supportedLdapVersion,
                   :supportedSASLMechanisms,
                 ])
-    (rs and rs.first) or Net::LDAP::Entry.new
+    rs&.first or Net::LDAP::Entry.new
   end
 
   # Return the root Subschema record from the LDAP server as a
@@ -1255,16 +1251,16 @@ class Net::LDAP
     rs = search(:ignore_server_caps => true, :base => "",
                 :scope => SearchScope_BaseObject,
                 :attributes => [:subschemaSubentry])
-    return Net::LDAP::Entry.new unless (rs and rs.first)
+    return Net::LDAP::Entry.new unless rs&.first
 
     subschema_name = rs.first.subschemasubentry
-    return Net::LDAP::Entry.new unless (subschema_name and subschema_name.first)
+    return Net::LDAP::Entry.new unless subschema_name&.first
 
     rs = search(:ignore_server_caps => true, :base => subschema_name.first,
                 :scope => SearchScope_BaseObject,
                 :filter => "objectclass=subschema",
                 :attributes => [:objectclasses, :attributetypes])
-    (rs and rs.first) or Net::LDAP::Entry.new
+    rs&.first or Net::LDAP::Entry.new
   end
 
   #--
@@ -1278,6 +1274,7 @@ class Net::LDAP
     # it returns binary data in the rfc2696_cookie which throws an
     # encoding exception breaking searching.
     return false if @force_no_page
+
     @server_caps ||= search_root_dse
     @server_caps[:supportedcontrol].include?(Net::LDAP::LDAPControls::PAGED_RESULTS)
   end
@@ -1308,9 +1305,10 @@ class Net::LDAP
         conn = new_connection
         result = conn.bind(args[:auth] || @auth)
         return result unless result.result_code == Net::LDAP::ResultCodeSuccess
+
         yield conn
       ensure
-        conn.close if conn
+        conn&.close
       end
     end
   end
@@ -1318,20 +1316,20 @@ class Net::LDAP
   # Establish a new connection to the LDAP server
   def new_connection
     connection = Net::LDAP::Connection.new \
-      :host                    => @host,
-      :port                    => @port,
-      :hosts                   => @hosts,
-      :encryption              => @encryption,
+      :host => @host,
+      :port => @port,
+      :hosts => @hosts,
+      :encryption => @encryption,
       :instrumentation_service => @instrumentation_service,
-      :connect_timeout         => @connect_timeout
+      :connect_timeout => @connect_timeout
 
     # Force connect to see if there's a connection error
     connection.socket
     connection
   rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT => e
     @result = {
-      :resultCode   => 52,
-      :errorMessage => ResultStrings[ResultCodeUnavailable],
+      :resultCode => 52,
+      :errorMessage => ResultStrings[ResultCodeUnavailable]
     }
     raise e
   end
@@ -1352,6 +1350,7 @@ class Net::LDAP
   # This is useful when a server does not support the DELETE_TREE control code.
   def recursive_delete(args)
     raise EmptyDNError unless args.is_a?(Hash) && args.key?(:dn)
+
     # Delete Children
     search(base: args[:dn], scope: Net::LDAP::SearchScope_SingleLevel) do |entry|
       recursive_delete(dn: entry.dn)
@@ -1360,7 +1359,8 @@ class Net::LDAP
     unless delete(dn: args[:dn])
       raise Net::LDAP::Error, get_operation_result[:error_message].to_s
     end
+
     true
   end
 
-end # class LDAP
+end

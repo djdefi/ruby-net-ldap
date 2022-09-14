@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This is a private class used internally by the library. It should not
 # be called by user code.
 class Net::LDAP::Connection #:nodoc:
@@ -45,29 +47,27 @@ class Net::LDAP::Connection #:nodoc:
 
     timeout = server[:connect_timeout] || DefaultConnectTimeout
     socket_opts = {
-      connect_timeout: timeout,
+      connect_timeout: timeout
     }
 
     errors = []
     hosts.each do |host, port|
-      begin
-        prepare_socket(server.merge(socket: @socket_class.new(host, port, socket_opts)), timeout)
-        if encryption
-          if encryption[:tls_options] &&
-             encryption[:tls_options][:verify_mode] &&
-             encryption[:tls_options][:verify_mode] == OpenSSL::SSL::VERIFY_NONE
-            warn "not verifying SSL hostname of LDAPS server '#{host}:#{port}'"
-          else
-            @conn.post_connection_check(host)
-          end
+      prepare_socket(server.merge(socket: @socket_class.new(host, port, socket_opts)), timeout)
+      if encryption
+        if encryption[:tls_options] &&
+           encryption[:tls_options][:verify_mode] &&
+           encryption[:tls_options][:verify_mode] == OpenSSL::SSL::VERIFY_NONE
+          warn "not verifying SSL hostname of LDAPS server '#{host}:#{port}'"
+        else
+          @conn.post_connection_check(host)
         end
-        return
-      rescue Net::LDAP::Error, SocketError, SystemCallError,
-             OpenSSL::SSL::SSLError => e
-        # Ensure the connection is closed in the event a setup failure.
-        close
-        errors << [e, host, port]
       end
+      return
+    rescue Net::LDAP::Error, SocketError, SystemCallError,
+           OpenSSL::SSL::SSLError => e
+      # Ensure the connection is closed in the event a setup failure.
+      close
+      errors << [e, host, port]
     end
 
     raise Net::LDAP::ConnectionError.new(errors)
@@ -76,7 +76,7 @@ class Net::LDAP::Connection #:nodoc:
   module GetbyteForSSLSocket
     def getbyte
       c = getc
-      c && c.ord
+      c&.ord
     end
   end
 
@@ -108,10 +108,12 @@ class Net::LDAP::Connection #:nodoc:
     rescue IO::WaitReadable
       raise Errno::ETIMEDOUT, "OpenSSL connection read timeout" unless
         IO.select([conn], nil, nil, timeout)
+
       retry
     rescue IO::WaitWritable
       raise Errno::ETIMEDOUT, "OpenSSL connection write timeout" unless
         IO.select(nil, [conn], nil, timeout)
+
       retry
     end
 
@@ -166,9 +168,7 @@ class Net::LDAP::Connection #:nodoc:
       write(request, nil, message_id)
       pdu = queued_read(message_id)
 
-      if pdu.nil? || pdu.app_tag != Net::LDAP::PDU::ExtendedResponse
-        raise Net::LDAP::NoStartTLSResultError, "no start_tls result"
-      end
+      raise Net::LDAP::NoStartTLSResultError, "no start_tls result" if pdu.nil? || pdu.app_tag != Net::LDAP::PDU::ExtendedResponse
 
       raise Net::LDAP::StartTLSError,
             "start_tls failed: #{pdu.result_code}" unless pdu.result_code.zero?
@@ -185,6 +185,7 @@ class Net::LDAP::Connection #:nodoc:
   #++
   def close
     return if !defined?(@conn) || @conn.nil?
+
     @conn.close
     @conn = nil
   end
@@ -390,19 +391,19 @@ class Net::LDAP::Connection #:nodoc:
 
     instrument "search.net_ldap_connection",
                message_id: message_id,
-               filter:     filter,
-               base:       base,
-               scope:      scope,
-               size:       size,
-               time:       time,
-               sort:       sort,
-               referrals:  refs,
-               deref:      deref,
+               filter: filter,
+               base: base,
+               scope: scope,
+               size: size,
+               time: time,
+               sort: sort,
+               referrals: refs,
+               deref: deref,
                attributes: attrs do |payload|
       loop do
         # should collect this into a private helper to clarify the structure
         query_limit = 0
-        if size > 0
+        if size.positive?
           query_limit = if paged
                           (((size - n_results) < 126) ? (size - n_results) : 0)
                         else
@@ -447,22 +448,18 @@ class Net::LDAP::Connection #:nodoc:
             n_results += 1
             yield pdu.search_entry if block_given?
           when Net::LDAP::PDU::SearchResultReferral
-            if refs
-              if block_given?
-                se = Net::LDAP::Entry.new
-                se[:search_referrals] = (pdu.search_referrals || [])
-                yield se
-              end
+            if refs && block_given?
+              se = Net::LDAP::Entry.new
+              se[:search_referrals] = (pdu.search_referrals || [])
+              yield se
             end
           when Net::LDAP::PDU::SearchResult
             result_pdu = pdu
             controls = pdu.result_controls
-            if refs && pdu.result_code == Net::LDAP::ResultCodeReferral
-              if block_given?
-                se = Net::LDAP::Entry.new
-                se[:search_referrals] = (pdu.search_referrals || [])
-                yield se
-              end
+            if refs && pdu.result_code == Net::LDAP::ResultCodeReferral && block_given?
+              se = Net::LDAP::Entry.new
+              se[:search_referrals] = (pdu.search_referrals || [])
+              yield se
             end
             break
           else
@@ -470,9 +467,7 @@ class Net::LDAP::Connection #:nodoc:
           end
         end
 
-        if result_pdu.nil?
-          raise Net::LDAP::ResponseMissingOrInvalidError, "response missing"
-        end
+        raise Net::LDAP::ResponseMissingOrInvalidError, "response missing" if result_pdu.nil?
 
         # count number of pages of results
         payload[:page_count] ||= 0
@@ -494,9 +489,9 @@ class Net::LDAP::Connection #:nodoc:
             if c.oid == Net::LDAP::LDAPControls::PAGED_RESULTS
               # just in case some bogus server sends us more than 1 of these.
               more_pages = false
-              if c.value and c.value.length > 0
+              if c.value&.length&.positive?
                 cookie = c.value.read_ber[1]
-                if cookie and cookie.length > 0
+                if cookie&.length&.positive?
                   rfc2696_cookie[1] = cookie
                   more_pages = true
                 end
@@ -506,13 +501,13 @@ class Net::LDAP::Connection #:nodoc:
         end
 
         break unless more_pages
-      end # loop
+      end
 
       # track total result count
       payload[:result_count] = n_results
 
       result_pdu || OpenStruct.new(:status => :failure, :result_code => Net::LDAP::ResultCodeOperationsError, :message => "Invalid search")
-    end # instrument
+    end
   ensure
 
     # clean up message queue for this search
@@ -529,20 +524,18 @@ class Net::LDAP::Connection #:nodoc:
   MODIFY_OPERATIONS = { #:nodoc:
     :add => 0,
     :delete => 1,
-    :replace => 2,
+    :replace => 2
   }
 
   def self.modify_ops(operations)
     ops = []
-    if operations
-      operations.each do |op, attrib, values|
-        # TODO, fix the following line, which gives a bogus error if the
-        # opcode is invalid.
-        op_ber = MODIFY_OPERATIONS[op.to_sym].to_ber_enumerated
-        values = [values].flatten.map { |v| v.to_ber if v }.to_ber_set
-        values = [attrib.to_s.to_ber, values].to_ber_sequence
-        ops << [op_ber, values].to_ber
-      end
+    operations&.each do |op, attrib, values|
+      # TODO, fix the following line, which gives a bogus error if the
+      # opcode is invalid.
+      op_ber = MODIFY_OPERATIONS[op.to_sym].to_ber_enumerated
+      values = [values].flatten.map { |v| v&.to_ber }.to_ber_set
+      values = [attrib.to_s.to_ber, values].to_ber_sequence
+      ops << [op_ber, values].to_ber
     end
     ops
   end
@@ -567,9 +560,7 @@ class Net::LDAP::Connection #:nodoc:
     write(request, nil, message_id)
     pdu = queued_read(message_id)
 
-    if !pdu || pdu.app_tag != Net::LDAP::PDU::ModifyResponse
-      raise Net::LDAP::ResponseMissingOrInvalidError, "response missing or invalid"
-    end
+    raise Net::LDAP::ResponseMissingOrInvalidError, "response missing or invalid" if !pdu || pdu.app_tag != Net::LDAP::PDU::ModifyResponse
 
     pdu
   end
@@ -612,9 +603,7 @@ class Net::LDAP::Connection #:nodoc:
     write(request, nil, message_id)
     pdu = queued_read(message_id)
 
-    if !pdu || pdu.app_tag != Net::LDAP::PDU::ExtendedResponse
-      raise Net::LDAP::ResponseMissingOrInvalidError, "response missing or invalid"
-    end
+    raise Net::LDAP::ResponseMissingOrInvalidError, "response missing or invalid" if !pdu || pdu.app_tag != Net::LDAP::PDU::ExtendedResponse
 
     pdu
   end
@@ -639,9 +628,7 @@ class Net::LDAP::Connection #:nodoc:
     write(request, nil, message_id)
     pdu = queued_read(message_id)
 
-    if !pdu || pdu.app_tag != Net::LDAP::PDU::AddResponse
-      raise Net::LDAP::ResponseMissingOrInvalidError, "response missing or invalid"
-    end
+    raise Net::LDAP::ResponseMissingOrInvalidError, "response missing or invalid" if !pdu || pdu.app_tag != Net::LDAP::PDU::AddResponse
 
     pdu
   end
@@ -662,9 +649,7 @@ class Net::LDAP::Connection #:nodoc:
     write(request.to_ber_appsequence(Net::LDAP::PDU::ModifyRDNRequest), nil, message_id)
     pdu = queued_read(message_id)
 
-    if !pdu || pdu.app_tag != Net::LDAP::PDU::ModifyRDNResponse
-      raise Net::LDAP::ResponseMissingOrInvalidError.new "response missing or invalid"
-    end
+    raise Net::LDAP::ResponseMissingOrInvalidError.new "response missing or invalid" if !pdu || pdu.app_tag != Net::LDAP::PDU::ModifyRDNResponse
 
     pdu
   end
@@ -681,9 +666,7 @@ class Net::LDAP::Connection #:nodoc:
     write(request, controls, message_id)
     pdu = queued_read(message_id)
 
-    if !pdu || pdu.app_tag != Net::LDAP::PDU::DeleteResponse
-      raise Net::LDAP::ResponseMissingOrInvalidError, "response missing or invalid"
-    end
+    raise Net::LDAP::ResponseMissingOrInvalidError, "response missing or invalid" if !pdu || pdu.app_tag != Net::LDAP::PDU::DeleteResponse
 
     pdu
   end
@@ -716,4 +699,4 @@ class Net::LDAP::Connection #:nodoc:
       Socket.tcp(host, port, **socket_opts)
     end
   end
-end # class Connection
+end

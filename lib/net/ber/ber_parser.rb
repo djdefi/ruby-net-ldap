@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 require 'stringio'
 
 # Implements Basic Encoding Rules parsing to be mixed into types as needed.
@@ -14,7 +16,7 @@ module Net::BER::BERParser
   }
   constructed = {
     16 => :array,
-    17 => :array,
+    17 => :array
   }
   universal = { :primitive => primitive, :constructed => constructed }
 
@@ -36,12 +38,13 @@ module Net::BER::BERParser
     object_type = (syntax && syntax[id]) || BuiltinSyntax[id]
 
     # == is expensive so sort this so the common cases are at the top.
-    if object_type == :string
+    case object_type
+    when :string
       s = Net::BER::BerIdentifiedString.new(data || "")
       s.ber_identifier = id
       s
-    elsif object_type == :integer
-      neg = !(data.unpack("C").first & 0x80).zero?
+    when :integer
+      neg = !(data.unpack1("C") & 0x80).zero?
       int = 0
 
       data.each_byte do |b|
@@ -53,7 +56,7 @@ module Net::BER::BERParser
       else
         int
       end
-    elsif object_type == :oid
+    when :oid
       # See X.690 pgh 8.19 for an explanation of this algorithm.
       # This is potentially not good enough. We may need a
       # BerIdentifiedOid as a subclass of BerIdentifiedArray, to
@@ -73,7 +76,7 @@ module Net::BER::BERParser
       oid.unshift g.first
       # Net::BER::BerIdentifiedOid.new(oid)
       oid
-    elsif object_type == :array
+    when :array
       seq = Net::BER::BerIdentifiedArray.new
       seq.ber_identifier = id
       sio = StringIO.new(data || "")
@@ -83,9 +86,9 @@ module Net::BER::BERParser
         seq << e
       end
       seq
-    elsif object_type == :boolean
+    when :boolean
       data != "\000"
-    elsif object_type == :null
+    when :null
       n = Net::BER::BerIdentifiedNull.new
       n.ber_identifier = id
       n

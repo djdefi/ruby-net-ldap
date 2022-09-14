@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 ##
 # BER extensions to the Array class.
 module Net::BER::Extensions::Array
@@ -74,6 +76,7 @@ module Net::BER::Extensions::Array
     ary = self.dup
     first = ary.shift
     raise Net::BER::BerError, "Invalid OID" unless [0, 1, 2].include?(first)
+
     first = first * 40 + ary.shift
     ary.unshift first
     oid = ary.pack("w*")

@@ -8,7 +8,7 @@
 
 # Offense count: 4
 # Cop supports --auto-correct.
-Layout/AlignArray:
+Layout/ArrayAlignment:
   Exclude:
     - 'lib/net/ldap.rb'
     - 'lib/net/ldap/auth_adapter/sasl.rb'
@@ -61,14 +61,14 @@ Layout/EmptyLinesAroundExceptionHandlingKeywords:
 # Cop supports --auto-correct.
 # Configuration parameters: SupportedStyles, IndentationWidth.
 # SupportedStyles: special_inside_parentheses, consistent, align_brackets
-Layout/IndentArray:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: SupportedStyles, IndentationWidth.
 # SupportedStyles: special_inside_parentheses, consistent, align_braces
-Layout/IndentHash:
+Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 
 # Offense count: 6
@@ -291,15 +291,6 @@ Style/BlockComments:
   Exclude:
     - 'test/test_rename.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: braces, no_braces, context_dependent
-Style/BracesAroundHashParameters:
-  Exclude:
-    - 'lib/net/ldap/auth_adapter/gss_spnego.rb'
-    - 'lib/net/snmp.rb'
-
 # Offense count: 4
 # Cop supports --auto-correct.
 Style/CharacterLiteral:
@@ -453,7 +444,7 @@ Style/MethodDefParentheses:
     - 'testserver/ldapserver.rb'
 
 # Offense count: 2
-Style/MethodMissing:
+Lint/MissingSuper:
   Exclude:
     - 'lib/net/ldap/dn.rb'
     - 'lib/net/ldap/entry.rb'
@@ -538,7 +529,7 @@ Style/NumericPredicate:
     - 'testserver/ldapserver.rb'
 
 # Offense count: 3
-Naming/BinaryOperatorParameter:
+Naming/BinaryOperatorParameterName:
   Exclude:
     - 'lib/net/ldap/filter.rb'
 
@@ -687,7 +678,7 @@ Style/TrivialAccessors:
 
 # Offense count: 5
 # Cop supports --auto-correct.
-Style/UnneededPercentQ:
+Style/RedundantPercentQ:
   Exclude:
     - 'net-ldap.gemspec'
     - 'test/test_entry.rb'

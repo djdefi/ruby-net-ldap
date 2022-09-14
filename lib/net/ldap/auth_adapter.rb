@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Net
   class LDAP
     class AuthAdapter
@@ -11,9 +13,8 @@ module Net
 
       def self.[](name)
         a = @adapters[name]
-        if a.nil?
-          raise Net::LDAP::AuthMethodUnsupportedError, "Unsupported auth method (#{name})"
-        end
+        raise Net::LDAP::AuthMethodUnsupportedError, "Unsupported auth method (#{name})" if a.nil?
+
         return a
       end
 

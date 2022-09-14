@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # $Id: testldif.rb 61 2006-04-18 20:55:55Z blackhedd $
 
 require_relative 'test_helper'
@@ -21,14 +23,14 @@ class TestLdif < Test::Unit::TestCase
 
   def test_ldif_with_comments
     str = ["# Hello from LDIF-land", "# This is an unterminated comment"]
-    io = StringIO.new(str[0] + "\r\n" + str[1])
+    io = StringIO.new("#{str[0]}\r\n#{str[1]}")
     ds = Net::LDAP::Dataset.read_ldif(io)
     assert_equal(str, ds.comments)
   end
 
   def test_ldif_with_password
     psw = "goldbricks"
-    hashed_psw = "{SHA}" + Base64.encode64(Digest::SHA1.digest(psw)).chomp
+    hashed_psw = "{SHA}#{Base64.encode64(Digest::SHA1.digest(psw)).chomp}"
 
     ldif_encoded = Base64.encode64(hashed_psw).chomp
     ds = Net::LDAP::Dataset.read_ldif(StringIO.new("dn: Goldbrick\r\nuserPassword:: #{ldif_encoded}\r\n\r\n"))
@@ -81,7 +83,7 @@ class TestLdif < Test::Unit::TestCase
 
     # added .lines to turn to array because 1.9 doesn't have
     # .grep on basic strings
-    entries = data.lines.grep(/^dn:\s*/) { $'.chomp }
+    entries = data.lines.grep(/^dn:\s*/) { ::Regexp.last_match.post_match.chomp }
     dn_entries = entries.dup
 
     ds = Net::LDAP::Dataset.read_ldif(io) do |type, value|
@@ -92,7 +94,7 @@ class TestLdif < Test::Unit::TestCase
       end
     end
     assert_equal(entries.size, ds.size)
-    assert_equal(entries.sort, ds.to_ldif.grep(/^dn:\s*/) { $'.chomp })
+    assert_equal(entries.sort, ds.to_ldif.grep(/^dn:\s*/) { ::Regexp.last_match.post_match.chomp })
   end
 
   def test_to_ldif_with_version

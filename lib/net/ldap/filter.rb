@@ -1,4 +1,5 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
 
 ##
 # Class Net::LDAP::Filter is used to constrain LDAP searches. An object of
@@ -25,10 +26,11 @@ class Net::LDAP::Filter
   # Known filter types.
   FilterTypes = [:ne, :eq, :ge, :le, :and, :or, :not, :ex, :bineq]
 
-  def initialize(op, left, right) #:nodoc:
+  def initialize(op, left, right) # :nodoc:
     unless FilterTypes.include?(op)
       raise Net::LDAP::OperatorError, "Invalid or unsupported operator #{op.inspect} in LDAP Filter."
     end
+
     @op = op
     @left = left
     @right = right
@@ -154,7 +156,7 @@ class Net::LDAP::Filter
     # attribute must begin with a particular string. The attribute value is
     # escaped, so the "*" character is interpreted literally.
     def begins(attribute, value)
-      new(:eq, attribute, escape(value) + "*")
+      new(:eq, attribute, "#{escape(value)}*")
     end
 
     ##
@@ -162,7 +164,7 @@ class Net::LDAP::Filter
     # attribute must end with a particular string. The attribute value is
     # escaped, so the "*" character is interpreted literally.
     def ends(attribute, value)
-      new(:eq, attribute, "*" + escape(value))
+      new(:eq, attribute, "*#{escape(value)}")
     end
 
     ##
@@ -170,7 +172,7 @@ class Net::LDAP::Filter
     # attribute must contain a particular string. The attribute value is
     # escaped, so the "*" character is interpreted literally.
     def contains(attribute, value)
-      new(:eq, attribute, "*" + escape(value) + "*")
+      new(:eq, attribute, "*#{escape(value)}*")
     end
 
     ##
@@ -246,10 +248,10 @@ class Net::LDAP::Filter
     #
     ESCAPES = {
       "\0" => '00', # NUL            = %x00 ; null character
-      '*'  => '2A', # ASTERISK       = %x2A ; asterisk ("*")
-      '('  => '28', # LPARENS        = %x28 ; left parenthesis ("(")
-      ')'  => '29', # RPARENS        = %x29 ; right parenthesis (")")
-      '\\' => '5C', # ESC            = %x5C ; esc (or backslash) ("\")
+      '*' => '2A', # ASTERISK       = %x2A ; asterisk ("*")
+      '(' => '28', # LPARENS        = %x28 ; left parenthesis ("(")
+      ')' => '29', # RPARENS        = %x29 ; right parenthesis (")")
+      '\\' => '5C' # ESC            = %x5C ; esc (or backslash) ("\")
     }
     # Compiled character class regexp using the keys from the above hash.
     ESCAPE_RE = Regexp.new(
@@ -260,7 +262,7 @@ class Net::LDAP::Filter
     ##
     # Escape a string for use in an LDAP filter
     def escape(string)
-      string.gsub(ESCAPE_RE) { |char| "\\" + ESCAPES[char] }
+      string.gsub(ESCAPE_RE) { |char| "\\#{ESCAPES[char]}" }
     end
 
     ##
@@ -280,8 +282,7 @@ class Net::LDAP::Filter
       when 0xa2 # context-specific constructed 2, "not"
         ~parse_ber(ber.first)
       when 0xa3 # context-specific constructed 3, "equalityMatch"
-        if ber.last == "*"
-        else
+        unless ber.last != "*"
           eq(ber.first, ber.last)
         end
       when 0xa4 # context-specific constructed 4, "substring"
@@ -290,7 +291,8 @@ class Net::LDAP::Filter
         ber.last.each do |b|
           case b.ber_identifier
           when 0x80 # context-specific primitive 0, SubstringFilter "initial"
-            raise Net::LDAP::SubstringFilterError, "Unrecognized substring filter; bad initial value." if str.length > 0
+            raise Net::LDAP::SubstringFilterError, "Unrecognized substring filter; bad initial value." if str.length.positive?
+
             str += escape(b)
           when 0x81 # context-specific primitive 0, SubstringFilter "any"
             str += "*#{escape(b)}"
@@ -534,6 +536,7 @@ class Net::LDAP::Filter
       unless @left =~ /^([-;\w]*)(:dn)?(:(\w+|[.\w]+))?$/
         raise Net::LDAP::BadAttributeError, "Bad attribute #{@left}"
       end
+
       type, dn, rule = $1, $2, $4
 
       seq << rule.to_ber_contextspecific(1) unless rule.to_s.empty? # matchingRule
@@ -616,7 +619,7 @@ class Net::LDAP::Filter
   # type of joining operator, then return both of them as an array (calling
   # coalesce recursively). If they're not, then return an array consisting
   # only of self.
-  def coalesce(operator) #:nodoc:
+  def coalesce(operator) # :nodoc:
     if @op == operator
       [@left.coalesce(operator), @right.coalesce(operator)]
     else
@@ -634,7 +637,7 @@ class Net::LDAP::Filter
     case @op
     when :eq
       if @right == "*"
-        l = entry[@left] and l.length > 0
+        l = entry[@left] and l.length.positive?
       else
         l = entry[@left] and l = Array(l) and l.index(@right)
       end
@@ -660,7 +663,7 @@ class Net::LDAP::Filter
   ##
   # Parses RFC 2254-style string representations of LDAP filters into Filter
   # object hierarchies.
-  class FilterParser #:nodoc:
+  class FilterParser # :nodoc:
     ##
     # The constructed filter.
     attr_reader :filter
@@ -733,11 +736,11 @@ class Net::LDAP::Filter
 
     def parse_paren_expression(scanner)
       if scanner.scan(/\s*\(\s*/)
-        expr = if scanner.scan(/\s*\&\s*/)
+        expr = if scanner.scan(/\s*&\s*/)
                  merge_branches(:&, scanner)
                elsif scanner.scan(/\s*\|\s*/)
                  merge_branches(:|, scanner)
-               elsif scanner.scan(/\s*\!\s*/)
+               elsif scanner.scan(/\s*!\s*/)
                  br = parse_paren_expression(scanner)
                  ~br if br
                else
@@ -755,11 +758,11 @@ class Net::LDAP::Filter
     # This parses a given expression inside of parentheses.
     def parse_filter_branch(scanner)
       scanner.scan(/\s*/)
-      if token = scanner.scan(/[-\w:.;]*[\w]/)
+      if token = scanner.scan(/[-\w:.;]*\w/)
         scanner.scan(/\s*/)
         if op = scanner.scan(/<=|>=|!=|:=|=/)
           scanner.scan(/\s*/)
-          if value = scanner.scan(/(?:[-\[\]{}\w*.+\/:@=,#\$%&!'^~\s\xC3\x80-\xCA\xAF]|[^\x00-\x7F]|\\[a-fA-F\d]{2})+/u)
+          if value = scanner.scan(/(?:[-\[\]{}\w*.+\/:@=,#$%&!'^~\s\xC3\x80-\xCA\xAF]|[^\x00-\x7F]|\\[a-fA-F\d]{2})+/u)
             # 20100313 AZ: Assumes that "(uid=george*)" is the same as
             # "(uid=george* )". The standard doesn't specify, but I can find
             # no examples that suggest otherwise.
@@ -781,5 +784,5 @@ class Net::LDAP::Filter
       end
     end
     private :parse_filter_branch
-  end # class Net::LDAP::FilterParser
-end # class Net::LDAP::Filter
+  end
+end

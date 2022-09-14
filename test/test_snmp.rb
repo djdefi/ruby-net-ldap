@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # $Id: testsnmp.rb 231 2006-12-21 15:09:29Z blackhedd $
 
 require_relative 'test_helper'
@@ -32,7 +34,7 @@ class TestSnmp < Test::Unit::TestCase
     assert_equal(nil, data.read_ber!)
     assert_equal("xxx", data)
 
-    data = SnmpGetRequest + "!!!"
+    data = "#{SnmpGetRequest}!!!"
     ary = data.read_ber!(Net::SNMP::AsnSyntax)
     assert_equal("!!!", data)
     assert ary.is_a?(Array)

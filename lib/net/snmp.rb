@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 require_relative 'ldap/version'
 
 # :stopdoc:
@@ -12,7 +14,7 @@ module Net
           2 => :integer,  # Gauge32 or Unsigned32, (RFC2578 sec 2)
           3 => :integer  # TimeTicks32, (RFC2578 sec 2)
         },
-        :constructed => {},
+        :constructed => {}
       },
       :context_specific => {
         :primitive => {},
@@ -20,8 +22,8 @@ module Net
           0 => :array,  # GetRequest PDU (RFC1157 pgh 4.1.2)
           1 => :array,  # GetNextRequest PDU (RFC1157 pgh 4.1.3)
           2 => :array    # GetResponse PDU (RFC1157 pgh 4.1.4)
-        },
-      },
+        }
+      }
     })
 
     # SNMP 32-bit counter.
@@ -78,7 +80,7 @@ module Net
       2 => "noSuchName",
       3 => "badValue",
       4 => "readOnly",
-      5 => "genErr",
+      5 => "genErr"
     }
 
     class << self
@@ -108,7 +110,7 @@ module Net
       rescue Error
         # Pass through any SnmpPdu::Error instances
         raise $!
-      rescue
+      rescue StandardError
         # Wrap any basic parsing error so it becomes a PDU-format error
         raise Error.new( "snmp-pdu format error" )
       end
@@ -155,6 +157,7 @@ module Net
         unless v.is_a?(Net::BER::BerIdentifiedNull)
             raise Error.new(" invalid variable-binding in get-request" )
         end
+
         add_variable_binding n, nil
       end
     end
@@ -180,6 +183,7 @@ module Net
       unless [0, 2].include?(ver)
         raise Error.new("unknown snmp-version: #{ver}")
       end
+
       @version = ver
     end
 
@@ -187,6 +191,7 @@ module Net
       unless PduTypes.include?(t)
         raise Error.new("unknown pdu-type: #{t}")
       end
+
       @pdu_type = t
     end
 
@@ -194,6 +199,7 @@ module Net
       unless ErrorStatusCodes.key?(es)
         raise Error.new("unknown error-status: #{es}")
       end
+
       @error_status = es
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../auth_adapter'
 
 module Net
@@ -44,9 +46,7 @@ module Net
             @connection.send(:write, request, nil, message_id)
             pdu = @connection.queued_read(message_id)
 
-            if !pdu || pdu.app_tag != Net::LDAP::PDU::BindResult
-              raise Net::LDAP::NoBindResultError, "no bind result"
-            end
+            raise Net::LDAP::NoBindResultError, "no bind result" if !pdu || pdu.app_tag != Net::LDAP::PDU::BindResult
 
             return pdu unless pdu.result_code == Net::LDAP::ResultCodeSaslBindInProgress
             raise Net::LDAP::SASLChallengeOverflowError, "sasl-challenge overflow" if ((n += 1) > MAX_SASL_CHALLENGES)

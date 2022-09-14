@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Add 'lib' to load path.
 require 'test/unit'
 require_relative '../lib/net/ldap'
@@ -19,9 +21,9 @@ CA_FILE =
   end
 
 BIND_CREDS = {
-  method:   :simple,
+  method: :simple,
   username: "cn=admin,dc=example,dc=org",
-  password: "admin",
+  password: "admin"
 }.freeze
 
 TLS_OPTS = OpenSSL::SSL::SSLContext::DEFAULT_PARAMS.merge({}).freeze
@@ -63,10 +65,10 @@ class LDAPIntegrationTestCase < Test::Unit::TestCase
   def setup
     @service = MockInstrumentationService.new
     @ldap = Net::LDAP.new \
-      host:           ENV.fetch('INTEGRATION_HOST', 'localhost'),
-      port:           ENV.fetch('INTEGRATION_PORT', 389),
+      host: ENV.fetch('INTEGRATION_HOST', 'localhost'),
+      port: ENV.fetch('INTEGRATION_PORT', 389),
       search_domains: %w(dc=example,dc=org),
-      uid:            'uid',
+      uid: 'uid',
       instrumentation_service: @service
     @ldap.authenticate "cn=admin,dc=example,dc=org", "admin"
   end

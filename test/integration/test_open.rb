@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test_helper'
 
 class TestBindIntegration < LDAPIntegrationTestCase
@@ -60,10 +62,10 @@ class TestBindIntegration < LDAPIntegrationTestCase
     dn = "uid=nested-open-added-user1,ou=People,dc=example,dc=org"
     attrs = {
       objectclass: %w(top inetOrgPerson organizationalPerson person),
-      uid:  "nested-open-added-user1",
-      cn:   "nested-open-added-user1",
-      sn:   "nested-open-added-user1",
-      mail: "nested-open-added-user1@rubyldap.com",
+      uid: "nested-open-added-user1",
+      cn: "nested-open-added-user1",
+      sn: "nested-open-added-user1",
+      mail: "nested-open-added-user1@rubyldap.com"
     }
 
     @ldap.delete dn: dn

@@ -1,4 +1,6 @@
 # -*- ruby encoding: utf-8 -*-
+# frozen_string_literal: true
+
 require 'ostruct'
 
 ##
@@ -70,11 +72,7 @@ class Net::LDAP::PDU
   # The application protocol format tag.
   attr_reader :app_tag
 
-  attr_reader :search_entry
-  attr_reader :search_referrals
-  attr_reader :search_parameters
-  attr_reader :bind_parameters
-  attr_reader :extended_response
+  attr_reader :search_entry, :search_referrals, :search_parameters, :bind_parameters, :extended_response
 
   ##
   # Returns RFC-2251 Controls if any.
@@ -93,8 +91,8 @@ class Net::LDAP::PDU
       # app-specific tag that has both primitive and constructed forms.
       @app_tag = ber_object[1].ber_identifier & 0x1f
       @ldap_controls = []
-    rescue Exception => ex
-      raise Net::LDAP::PDU::Error, "LDAP PDU Format Error: #{ex.message}"
+    rescue Exception => e
+      raise Net::LDAP::PDU::Error, "LDAP PDU Format Error: #{e.message}"
     end
 
     case @app_tag
@@ -175,7 +173,7 @@ class Net::LDAP::PDU
     @ldap_result = {
       :resultCode => sequence[0],
       :matchedDN => sequence[1],
-      :errorMessage => sequence[2],
+      :errorMessage => sequence[2]
     }
     parse_search_referral(sequence[3]) if @ldap_result[:resultCode] == Net::LDAP::ResultCodeReferral
   end
@@ -198,7 +196,7 @@ class Net::LDAP::PDU
     @ldap_result = {
       :resultCode => sequence[0],
       :matchedDN => sequence[1],
-      :errorMessage => sequence[2],
+      :errorMessage => sequence[2]
     }
     @extended_response = sequence[3]
   end
@@ -267,7 +265,7 @@ class Net::LDAP::PDU
     @ldap_controls = sequence.map do |control|
       o = OpenStruct.new
       o.oid, o.criticality, o.value = control[0], control[1], control[2]
-      if o.criticality and o.criticality.is_a?(String)
+      if o.criticality.is_a?(String)
         o.value = o.criticality
         o.criticality = false
       end
@@ -305,7 +303,7 @@ module Net
   ##
   # Handle renamed constants Net::LdapPdu (Net::LDAP::PDU) and
   # Net::LdapPduError (Net::LDAP::PDU::Error).
-  def self.const_missing(name) #:nodoc:
+  def self.const_missing(name) # :nodoc:
     case name.to_s
     when "LdapPdu"
       warn "Net::#{name} has been deprecated. Use Net::LDAP::PDU instead."
@@ -318,4 +316,4 @@ module Net
       super
     end
   end
-end # module Net
+end

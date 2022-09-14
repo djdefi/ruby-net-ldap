@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test_helper'
 
 class TestPasswordModifyIntegration < LDAPIntegrationTestCase
@@ -14,17 +16,15 @@ class TestPasswordModifyIntegration < LDAPIntegrationTestCase
       cn: 'modify-password-user1',
       sn: 'modify-password-user1',
       mail: 'modify-password-user1@rubyldap.com',
-      userPassword: 'admin',
+      userPassword: 'admin'
     }
-    unless @ldap.search(base: @dn, scope: Net::LDAP::SearchScope_BaseObject)
-      assert @ldap.add(dn: @dn, attributes: attrs), @ldap.get_operation_result.inspect
-    end
+    assert @ldap.add(dn: @dn, attributes: attrs), @ldap.get_operation_result.inspect unless @ldap.search(base: @dn, scope: Net::LDAP::SearchScope_BaseObject)
     assert @ldap.search(base: @dn, scope: Net::LDAP::SearchScope_BaseObject)
 
     @auth = {
       method: :simple,
       username: @dn,
-      password: 'admin',
+      password: 'admin'
     }
   end
 

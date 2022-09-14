@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'test_helper'
 
 class TestEntry < Test::Unit::TestCase
@@ -44,7 +46,7 @@ class TestEntry < Test::Unit::TestCase
     @entry['sn'] = 'Jensen'
     expected     = {
       dn: ['cn=Barbara,o=corp'],
-      sn: ['Jensen'],
+      sn: ['Jensen']
     }
     duplicate = @entry.to_h
     assert_equal expected, duplicate

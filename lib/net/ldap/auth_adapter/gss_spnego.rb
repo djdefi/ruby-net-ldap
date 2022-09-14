@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../auth_adapter'
 require_relative 'sasl'
 
@@ -30,8 +32,8 @@ module Net
           end
 
           Net::LDAP::AuthAdapter::Sasl.new(@connection).bind \
-            :method             => :sasl,
-            :mechanism          => "GSS-SPNEGO",
+            :method => :sasl,
+            :mechanism => "GSS-SPNEGO",
             :initial_credential => NTLM::Message::Type1.new.serialize,
             :challenge_response => nego
         end

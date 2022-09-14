@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../auth_adapter'
 
 module Net
@@ -22,9 +24,7 @@ module Net
           @connection.send(:write, request, nil, message_id)
           pdu = @connection.queued_read(message_id)
 
-          if !pdu || pdu.app_tag != Net::LDAP::PDU::BindResult
-            raise Net::LDAP::NoBindResultError, "no bind result"
-          end
+          raise Net::LDAP::NoBindResultError, "no bind result" if !pdu || pdu.app_tag != Net::LDAP::PDU::BindResult
 
           pdu
         end

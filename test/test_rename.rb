@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'test_helper'
 
 # Commented out since it assumes you have a live LDAP server somewhere. This

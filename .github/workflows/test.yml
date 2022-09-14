@@ -23,9 +23,14 @@ jobs:
           - "2.6"
           - "2.7"
           - "3.0"
+          - "3.1"
           - "jruby-9.2"
           - "truffleruby-21.0.0"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - name: Add hosts to /etc/hosts
+      run: |
+        sudo echo "127.0.0.1 ldap.example.org" | sudo tee -a /etc/hosts
+        sudo echo "127.0.0.1 cert.mismatch.example.org" | sudo tee -a /etc/hosts
     - name: Run tests with Ruby ${{ matrix.ruby }}
       run: docker-compose run ci-${{ matrix.ruby }}
